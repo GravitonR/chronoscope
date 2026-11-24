@@ -1,0 +1,28 @@
+{
+  "name": "@gravitonresearch/chronoscope-mcp",
+  "version": "0.1.0",
+  "description": "Real-time Cognitive Precision State & Circadian Scheduling MCP Server for AI assistants (Graviton Research Foundation)",
+  "type": "commonjs",
+  "main": "server.js",
+  "bin": {
+    "chronoscope-mcp": "./server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-mcp.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT",
+  "homepage": "https://gravitonresearch.org/lab/chronoscope/",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "circadian",
+    "psychophysics",
+    "scheduling",
+    "cognitive-state",
+    "graviton"
+  ]
+}

@@ -1,0 +1,28 @@
+name: ChronoScope CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  mcp-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run MCP stdio integration tests
+        run: node mcp-server/test-mcp.mjs
+
+  apple-core:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test ChronoScopeCore + ChronoScopeMac
+        working-directory: apple
+        run: |
+          swift build
+          swift test

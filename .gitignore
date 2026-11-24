@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+.swiftpm/
+apple/.build/
+apple/.swiftpm/
+*.xcodeproj/xcuserdata/
+node_modules/
+npm-debug.log*
+.env
+.env.*
