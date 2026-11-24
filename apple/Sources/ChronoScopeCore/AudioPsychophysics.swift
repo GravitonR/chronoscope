@@ -21,6 +21,25 @@ public final class AudioPsychophysicsEngine {
 
     public init() {}
 
+    private nonisolated static func makeKeepAliveNode(format: AVAudioFormat, sampleRate: Double) -> AVAudioSourceNode {
+        var phase: Double = 0.0
+        let phaseStep = 2.0 * .pi * 70.0 / sampleRate
+        return AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList -> OSStatus in
+            let abl = UnsafeMutableAudioBufferListPointer(audioBufferList)
+            for frame in 0..<Int(frameCount) {
+                let sample = Float(sin(phase) * 0.00025) // ~ -72 dB keep-alive carrier
+                phase += phaseStep
+                if phase > 2.0 * .pi { phase -= 2.0 * .pi }
+                for buf in abl {
+                    if let ptr = buf.mData?.assumingMemoryBound(to: Float.self) {
+                        ptr[frame] = sample
+                    }
+                }
+            }
+            return noErr
+        }
+    }
+
     public func startSessionAudio() {
         #if os(iOS)
         let session = AVAudioSession.sharedInstance()
@@ -34,23 +53,7 @@ public final class AudioPsychophysicsEngine {
         engine.connect(player, to: engine.mainMixerNode, format: format)
 
         if airPodsKeepAliveEnabled {
-            var phase: Double = 0.0
-            let sr = sampleRate
-            let phaseStep = 2.0 * .pi * 70.0 / sr
-            let src = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList -> OSStatus in
-                let abl = UnsafeMutableAudioBufferListPointer(audioBufferList)
-                for frame in 0..<Int(frameCount) {
-                    let sample = Float(sin(phase) * 0.00025) // ~ -72 dB keep-alive carrier
-                    phase += phaseStep
-                    if phase > 2.0 * .pi { phase -= 2.0 * .pi }
-                    for buf in abl {
-                        if let ptr = buf.mData?.assumingMemoryBound(to: Float.self) {
-                            ptr[frame] = sample
-                        }
-                    }
-                }
-                return noErr
-            }
+            let src = Self.makeKeepAliveNode(format: format, sampleRate: sampleRate)
             keepAliveNode = src
             engine.attach(src)
             engine.connect(src, to: engine.mainMixerNode, format: format)
